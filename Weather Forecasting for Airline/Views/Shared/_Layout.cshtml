@@ -1,0 +1,557 @@
+﻿@using Microsoft.Extensions.Configuration
+@using Microsoft.AspNetCore.Http
+@model StateVM
+
+@inject IConfiguration _config
+
+@inject IHttpContextAccessor httpContextAccessor
+@{
+    string domain = $"{httpContextAccessor.HttpContext.Request.Scheme}://{httpContextAccessor.HttpContext.Request.Host.Value}/";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Frez Flight</title>
+
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="~/css/fontAwesome.css">
+    <link rel="stylesheet" href="~/css/templatemo-style.css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:100,200,300,400,500,600,700,800,900" rel="stylesheet">
+    <script src="~/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <link rel="stylesheet" href="~/css/site.css" />
+    <script>
+        const baseUrl = '@domain'
+    </script>
+</head>
+
+<body>
+    <div class="overlay"></div>
+    <section class="top-part">
+        <video controls autoplay loop>
+            <source src="videos/video.mp4" type="video/mp4">
+            <source src="videos/video.ogg" type="video/ogg">
+            Your browser does not support the video tag.
+        </video>
+    </section>
+
+    <section class="cd-hero">
+
+        <div class="cd-slider-nav">
+            <nav>
+                <span class="cd-marker item-1"></span>
+                <ul>
+                    <li class="selected"><a href="#0"><div class="image-icon"><img src="img/home-icon.png"></div><h6>Welcome</h6></a></li>
+                    <li><a href="#0"><div class="image-icon"><img src="img/about-icon.png"></div><h6>About Us</h6></a></li>
+                    <li><a href="#0"><div class="image-icon"><img src="img/featured-icon.png"></div><h6>Featured</h6></a></li>
+                    <li><a href="#0"><div class="image-icon"><img src="img/projects-icon.png"></div><h6>Projects</h6></a></li>
+                    <li><a href="#0"><div class="image-icon"><img src="img/contact-icon.png"></div><h6>Contact Us</h6></a></li>
+                </ul>
+            </nav>
+        </div> <!-- .cd-slider-nav -->
+
+        <ul class="cd-hero-slider">
+
+            <li class="selected">
+                <div class="heading">
+                    <h1>Frez Flight</h1>
+                    <span>Welcome to Weather Forecasting System for Aviation Industry Agency</span>
+                </div>
+                <div class="cd-full-width first-slide">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="content first-content">
+                                    <h4>About @_config["Site:Name"]</h4>
+                                    <p>
+                                        @_config["Site:AboutUs"]
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="content first-content">
+                                    <h4>Check Weather Condition</h4>
+                                    <p>
+                                        <h3>Select Start and Destination Routes</h3>
+                                        <select asp-for="stateRoutes" id="stateRoutes" name="stateRoutes" class="custom-select tm-select-accounts">
+                                            <option selected>Select Start</option>
+                                            @foreach (var stateRoute in Model.stateRoutes)
+                                            {
+                                                <option value="@stateRoute.Id">@stateRoute.From to @stateRoute.To</option>
+
+                                            }
+                                        </select>
+
+                                        <div class="primary-button">
+                                            <a id="checkWeather">Check Weather Condition</a>
+                                        </div>
+
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (Model.WeatherLogs != null)
+                        {
+                            <div class="row">
+                                @foreach (var weatherlog in Model.WeatherLogs)
+	{
+                                <div class="col-md-3">
+                                    <p>Pressure: @weatherlog.Pressure</p>
+                                    <p>Humilty: @weatherlog.Humidity</p>
+                                    <p>Weather: @weatherlog.Main</p>
+                                    <p>Description: @weatherlog.Description</p>
+                                </div>
+	}
+                                
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </li>
+
+            <li>
+                <div class="heading">
+                    <h1>Check Weather Forecast</h1>
+                    <span>Check a weather forecast of a route</span>
+                </div>
+
+                <div class="cd-half-width second-slide">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="content second-content">
+                                    <div class="row">
+                                        <div class="col-md-7 right-feature-text">
+                                            <h4>Add: <em>New Route</em></h4>
+
+                                            <form asp-action="addRoute" method="post">
+                                                <h4>From</h4>
+                                                <select asp-for="stateFrom" id="stateFrom" name="stateFrom" class="custom-select tm-select-accounts">
+                                                    <option selected>Select Start</option>
+                                                    @foreach (var state in Model.states)
+                                                    {
+                                                        <option value="@state.Name">@state.Name</option>
+
+                                                    }
+                                                </select>
+
+                                                <h4>To</h4>
+                                                <select asp-for="stateTo" id="stateTo" name="stateTo" class="custom-select tm-select-accounts">
+                                                    <option selected>Select Destination</option>
+                                                    @foreach (var state in Model.states)
+                                                    {
+                                                        <option value="@state.Name">@state.Name</option>
+
+                                                    }
+                                                </select>
+
+                                                <h4>Add: <em>Inter-State Routes</em></h4>
+                                                <input id="txtroute" type="text" name="allRoute" style="display:none;">
+
+                                                @foreach (var state in Model.states)
+                                                {
+                                                    <input type="checkbox" id="" name="stateRoutes" value="@state.Name">
+                                                    <label for=""> @state.Name</label><br>
+                                                }
+                                                @*<input type="checkbox" id="vehicle1" name="vehicle1" value="Bike">
+                                                    <label for="vehicle1"> I have a bike</label><br>
+                                                    <input type="checkbox" id="vehicle2" name="vehicle2" value="Car">
+                                                    <label for="vehicle2"> I have a car</label><br>
+                                                    <input type="checkbox" id="vehicle3" name="vehicle3" value="Boat">
+                                                    <label for="vehicle3"> I have a boat</label><br><br>*@
+
+                                                <div class="primary-button">
+                                                    <a id="addState">Add Inter-State</a>
+                                                </div>
+
+                                            </form>
+
+
+                                            <img src="img/left-feature-image.png">
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="right-feature-text">
+                                                <h4>Featured Product: <em>Newline</em></h4>
+                                                <p>Lorem ipsum dolor amet, consecte adipiscing elit, quisque dictum convallis mi. In dapibus auctor dictum donec mattis quis eros ultricies feugiat. Morbi congue faucibus mi, ague blandit curabitur ac lacinia.</p>
+                                                <div class="feature-list">
+                                                    <ul>
+                                                        <p>- Suspendisse mattis finibus sem</p>
+                                                        <p>- Pellentesque et urna vel lectus</p>
+                                                        <p>- Vestibulum iaculis nisi dui</p>
+                                                        <p>- Donec sagittis eros , ac tempus ligula</p>
+                                                        <p>- Integer sapien risus, auctor</p>
+                                                    </ul>
+                                                </div>
+                                                <div class="primary-button">
+                                                    <a href="#">Discover More</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <li>
+                <div class="heading">
+                    <h1>About Us</h1>
+                    <span>Get More Info About Our Agency</span>
+                </div>
+                <div class="cd-half-width third-slide">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12">
+
+                                <div class="content third-content">
+                                    <div class="row">
+                                        <div class="col-md-7 left-image">
+                                            <img src="img/left-about-image.jpg">
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="right-about-text">
+                                                <h4>Who we are?</h4>
+                                                <p>
+                                                    @_config["Site:AboutUs"]
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-7">
+                                            <div class="left-about-text">
+                                                <h4>What we do?</h4>
+                                                <p>
+                                                    @_config["Site:AboutUs1"]
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5 right-image">
+                                            <img src="img/right-about-image.jpg">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <li>
+                <div class="heading">
+                    <h1>Our projects</h1>
+                    <span>Here you can check our recent projects</span>
+                </div>
+                <div class="cd-half-width fourth-slide">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="content fourth-content">
+                                    <div class="row">
+                                        <div class="col-md-3 project-item">
+                                            <a href="img/item-01.jpg" data-lightbox="image-1"><img src="img/project-item-01.jpg"></a>
+                                        </div>
+                                        <div class="col-md-3 project-item">
+                                            <a href="img/item-02.jpg" data-lightbox="image-1"><img src="img/project-item-02.jpg"></a>
+                                        </div>
+                                        <div class="col-md-3 project-item">
+                                            <a href="img/item-03.jpg" data-lightbox="image-1"><img src="img/project-item-03.jpg"></a>
+                                        </div>
+                                        <div class="col-md-3 project-item">
+                                            <a href="img/item-04.jpg" data-lightbox="image-1"><img src="img/project-item-04.jpg"></a>
+                                        </div>
+                                        <div class="col-md-3 project-item">
+                                            <a href="img/item-05.jpg" data-lightbox="image-1"><img src="img/project-item-05.jpg"></a>
+                                        </div>
+                                        <div class="col-md-3 project-item">
+                                            <a href="img/item-06.jpg" data-lightbox="image-1"><img src="img/project-item-06.jpg"></a>
+                                        </div>
+                                        <div class="col-md-3 project-item">
+                                            <a href="img/item-07.jpg" data-lightbox="image-1"><img src="img/project-item-07.jpg"></a>
+                                        </div>
+                                        <div class="col-md-3 project-item">
+                                            <a href="img/item-08.jpg" data-lightbox="image-1"><img src="img/project-item-08.jpg"></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <li>
+                <div class="heading">
+                    <h1>Contact us</h1>
+                    <span>You'll be responded within 48 hrs</span>
+                </div>
+                <div class="cd-half-width fivth-slide">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="content fivth-content">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="left-info">
+                                                <p>
+                                                    Maecenas imperdiet sagittis lacus, ut consequat velit iaculis id. Praesent eu consequat urna. Morbi justo dolor, ornare sed lorem et, auctor iaculis ligula.
+                                                    <br><br>
+                                                    <em>5566 Donec mollis libero<br>at metus luctus 10660</em>
+                                                </p>
+                                                <ul class="social-icons">
+                                                    <i><a href="#"><i class="fa fa-facebook"></i></a></i>
+                                                    <i><a href="#"><i class="fa fa-twitter"></i></a></i>
+                                                    <i><a href="#"><i class="fa fa-linkedin"></i></a></i>
+                                                    <i><a href="#"><i class="fa fa-rss"></i></a></i>
+                                                    <i><a href="#"><i class="fa fa-behance"></i></a></i>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="row">
+                                                <form id="contact" action="" method="post">
+                                                    <div class="col-md-6">
+                                                        <fieldset>
+                                                            <input name="name" type="text" class="form-control" id="name" placeholder="Your Name" required="">
+                                                        </fieldset>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <fieldset>
+                                                            <input name="email" type="email" class="form-control" id="email" placeholder="Email" required="">
+                                                        </fieldset>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <fieldset>
+                                                            <textarea name="message" rows="6" class="form-control" id="message" placeholder="Message" required=""></textarea>
+                                                        </fieldset>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <fieldset>
+                                                            <button type="submit" id="form-submit" class="btn">Send Message</button>
+                                                        </fieldset>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+
+        </ul>
+    </section>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer>
+        <p>
+            Copyright &copy; @DateTime.Now.Year | Frez Flight
+    </footer>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/vendor/jquery-1.11.2.min.js"><\/script>')</script>
+
+    <script src="js/vendor/bootstrap.min.js"></script>
+    <script src="js/plugins.js"></script>
+    <script src="js/main.js"></script>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/lib/axios/axios.min.js"></script>
+    <script src="~/lib/sweetalert/sweetalert.min.js"></script>
+
+    @RenderSection("Scripts", required: false)
+
+    <script>
+        const homePage = `${baseUrl}`;
+
+        var btnAdd = document.getElementById("addState");
+        var checkWeather = document.getElementById("checkWeather");
+
+        btnAdd.addEventListener("click", function () {
+
+            console.log("btn checked");
+
+            const B_SArray = [];
+            $('input:checkbox[name="stateRoutes"]:checked').each(function () {
+                var B_S = $(this).val();
+                B_SArray.push(B_S);
+            });
+            const allSelectedRoutes = JSON.stringify(B_SArray);
+
+            var fDrop = document.getElementById("stateFrom");
+            var tDrop = document.getElementById("stateTo");
+            var istateTo = tDrop.value;
+            var istateFrom = fDrop.value;
+
+
+            var model = {
+                stateTo: istateTo,
+                stateFrom: istateFrom,
+                allRoute: allSelectedRoutes
+            };
+
+            // $('txtroute').val(allSelectedRoutes);
+            console.log(allSelectedRoutes);
+
+            axios.post(baseUrl + 'Home/AddRoute', model).then(response => {
+                console.log(response);
+                const { status, message } = response.data;
+                if (!status) {
+                    Swal.fire({
+                        text: `${message}`,
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    });
+                    return;
+                }
+                if (status) {
+                    Swal.fire({
+                        text: `${message}`,
+                        icon: "success",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    });
+                    location.href = homePage;
+                    return;
+                }
+
+            }).catch(err => {
+                console.log(err)
+                if (err.response) {
+                    if (!err.response.data.status) {
+                        Swal.fire({
+                            text: `${err.response.data.message}`,
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "Ok",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        });
+                        return;
+                    }
+                }
+            });
+
+        });
+
+        checkWeather.addEventListener("click", function () {
+
+            console.log("btn checkWeather");
+
+            var stateRoutesDrop = document.getElementById("stateRoutes");
+            var istateRoutesDrop = stateRoutesDrop.value;
+            var model = {
+                RouteId: istateRoutesDrop
+            }
+
+            axios.post(baseUrl + 'Home/CheckWeather', model).then(response => {
+                console.log(response);
+                const { status, message } = response.data;
+                if (!status) {
+                    Swal.fire({
+                        text: `${message}`,
+                        icon: "error",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    });
+                    return;
+                }
+                if (status) {
+                    Swal.fire({
+                        text: `${message}`,
+                        icon: "success",
+                        buttonsStyling: false,
+                        confirmButtonText: "Ok",
+                        customClass: {
+                            confirmButton: "btn btn-primary"
+                        }
+                    });
+                    location.href = homePage;
+                    return;
+                }
+
+            }).catch(err => {
+                console.log(err)
+                if (err.response) {
+                    if (!err.response.data.status) {
+                        Swal.fire({
+                            text: `${err.response.data.message}`,
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "Ok",
+                            customClass: {
+                                confirmButton: "btn btn-primary"
+                            }
+                        });
+                        return;
+                    }
+                }
+            });
+
+        });
+
+        //function WeatherApi(location) {
+        //    console.log("WAPI")
+        //    const options = {
+        //        method: 'GET',
+        //        url: 'https://open-weather13.p.rapidapi.com/city/' + location,
+        //        headers: {
+        //            'X-RapidAPI-Key': 'e78331c71bmsh927e2a46e4b79bdp1c3364jsn79de47f8c800',
+        //            'X-RapidAPI-Host': 'open-weather13.p.rapidapi.com'
+        //        }
+        //    };
+
+        //    axios.request(options).then(function (response) {
+        //        if (response.status == 200) {
+        //            var idata = response.data;
+        //            console.log(idata);
+        //            console.log(typeof (idata));
+        //            return idata;
+
+        //        }
+        //        //console.log(response);
+
+        //    }).catch(function (error) {
+        //        console.error(error);
+        //    });
+        //}
+       
+
+
+    </script>
+</body>
+</html>
